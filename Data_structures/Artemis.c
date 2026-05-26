@@ -23,41 +23,40 @@ void login(){
     fgets(nome, sizeof(nome), stdin);
     nome[strlen(nome) - 1] = '\0';
     printf("\n");
-    printf("Digite o seu ID de tripulante da nave (digite um ID alfanumerico ex: 1A35V54S para simular um ID): ");
+    printf("Digite o seu ID de tripulante da nave (digite um ID alfanumerico ex: 1A34V54S para simular um ID): ");
     fgets(ID,sizeof(ID), stdin);
     ID[strlen(ID) - 1] = '\0';
     printf("\n");
     printf("Bem vindo tripulante "GREEN"%s " RESET"ID: " GREEN"%s\n"RESET, nome, ID);
 }
 
-void Status(){
+void Status(float temperature, float energy, int comunication){
     if (!dadosInseridos){
         printf(RED"Dados ainda nao foram inseridos...\n"RESET);
         printf("Insira os dados para prosseguir\n");
-        opcao = 5;
     }
     else{
     sleep(1);
     printf("\nStatus\n");
-    if(temperatura >= 80){
-        printf("Temperatura da capsula: "RED"%.1f"RESET"ºC\n", temperatura);
+    if(temperature >= 80){
+        printf("Temperatura da capsula: "RED"%.1f"RESET"ºC\n", temperature);
     }
-    else if(temperatura < 80 && temperatura >= 71){
-        printf("Temperatura da capsula: "YELLOW"%.1f"RESET"ºC\n", temperatura);
-    }
-    else{
-    printf("Temperatura: %.1fºC\n", temperatura);}
-    if(energia <= 20){
-        printf("Energia da capsula: "RED"%.1f\n"RESET, energia);
-    }
-    else if(energia > 20 && energia < 30){
-        printf("Energia da capsula: "YELLOW"%.1f\n", energia);
+    else if(temperature < 80 && temperature >= 71){
+        printf("Temperatura da capsula: "YELLOW"%.1f"RESET"ºC\n", temperature);
     }
     else{
-    printf("Energia da capsula: %.1f\n", energia);}
-    if(comunicacao == 1){printf("Comunicacao: "GREEN"OK\n"RESET);}
+    printf("Temperatura: %.1fºC\n", temperature);}
+    if(energy <= 20){
+        printf("Energia da capsula: "RED"%.1f\n"RESET, energy);
+    }
+    else if(energy > 20 && energy < 30){
+        printf("Energia da capsula: "YELLOW"%.1f\n", energy);
+    }
+    else{
+    printf("Energia da capsula: %.1f\n", energy);}
+    if(comunication == 1){printf("Comunicacao: "GREEN"OK\n"RESET);}
     else{printf("Comunicacao: "RED"desconectada\n"RESET);}
-    opcao = 5;}
+    }
     sleep(1);
 
 }
@@ -65,30 +64,30 @@ void Status(){
 void Temperatura(float temperature){
     if(temperature > 80){
         printf(RED"SUPERAQUECIMENTO DETECTADO!\n"RESET);
-        printf("Temperatura da capsula: "YELLOW"%.1f"RESET"ºC\n", temperatura);
+        printf("Temperatura da capsula: "YELLOW"%.1f"RESET"ºC\n", temperature);
     }
     else if(temperature < 80 && temperature >= 71){
         printf(YELLOW"TEMPERATURA QUASE EM NIVEL DE SUPERAQUECIMENTO\n"RESET);
-        printf("Temperatura da capsula: "YELLOW"%.1f"RESET"ºC\n", temperatura);
+        printf("Temperatura da capsula: "YELLOW"%.1f"RESET"ºC\n", temperature);
     }
     else{
         printf(GREEN"TEMPERATURA NORMAL\n"RESET);
-        printf("Temperatura da capsula: "GREEN"%.1f"RESET"ºC\n", temperatura);
+        printf("Temperatura da capsula: "GREEN"%.1f"RESET"ºC\n", temperature);
     }
 }
 
 void Energia(float energy){
     if(energy < 20){
         printf(RED"BAIXA ENERGIA DETECTADA\n"RESET);
-        printf("Energia da capsula: "YELLOW"%.1f\n"RESET, energia);
+        printf("Energia da capsula: "YELLOW"%.1f\n"RESET, energy);
     }
-    else if(energy > 20 && energy >= 30){
+    else if(energy > 20 && energy <= 30){
         printf(YELLOW"ENERGIA PERTO DA RESERVA\n"RESET);
-        printf("Energia da capsula: "YELLOW"%.1f\n"RESET, energia);
+        printf("Energia da capsula: "YELLOW"%.1f\n"RESET, energy);
     }
     else{
         printf("ENERGIA OK\n");
-        printf("Energia da capsula: "GREEN"%.1f\n"RESET, energia);
+        printf("Energia da capsula: "GREEN"%.1f\n"RESET, energy);
     }
 }
 
@@ -121,10 +120,27 @@ int main(){
             scanf("%f", &temperatura);
             while(getchar() != '\n');
             printf("\n");
+            if(temperatura > 80){
+                printf(RED"ALETA DE SUPERAQUECIMENTO!\n"RESET);
+                printf("Temperatura em: "RED"%.1f"RESET"ºC\n", temperatura);
+            }
+            else if(temperatura < 80 && temperatura >= 71){
+                printf(YELLOW"ATENCAO!"RESET" TEMPERATURA ACIMA DO ESPERADO\n");
+                printf("Temperatura em: "YELLOW"%.1f"RESET"ºC\n", temperatura);
+            }
+            printf("\n");
             printf("Porcentagem de energia da capsula: ");
             scanf("%f", &energia);
             while(getchar() != '\n');
             printf("\n");
+            if(energia <= 20){
+                printf(RED"ALERTA! BAIXA ENERGIA\n"RESET);
+                printf("Energia em: "RED"%.1f\n"RESET, energia);
+            }
+            else if(energia > 20 && energia <= 30){
+                printf(YELLOW"ATENCAO!"RESET"ENERGIA PERTO DA RESERVA\n");
+                printf("Energia em: "YELLOW"%.1f\n"RESET, energia);
+            }
             do{
             printf("Confirme se ha comunicacao com Houston (1 para sim | 0 para nao): ");
             scanf("%d", &comunicacao);
@@ -134,14 +150,16 @@ int main(){
                 printf("Confirmacao invalida... tente novamente\n");
                 comunicacao = 2;
             }
+            else if(comunicacao == 0){
+                printf(RED"ALERTA! SEM COMUNICACAO COM HOUSTON\n"RESET);
+            }
             }while(comunicacao >= 2);
         dadosInseridos = 1;
-        opcao = 5;
         sleep(1);
         break;
 
         case 2:
-            Status();
+            Status(temperatura, energia, comunicacao);
             break;
         
         case 3:
@@ -172,7 +190,6 @@ int main(){
                 Energia(energia);
                 Comunicacao(comunicacao);
             }
-            opcao = 5;
             sleep(2);
             break;
 
